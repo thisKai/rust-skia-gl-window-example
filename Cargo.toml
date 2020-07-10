@@ -1,0 +1,12 @@
+[package]
+name = "skia-gl-window-example"
+version = "0.1.0"
+authors = ["Kai <thiskaiguy@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+skia-safe = { version = "0", features = ["gl", "textlayout"] }
+glutin = "0.24"
+gl = "0.14"
