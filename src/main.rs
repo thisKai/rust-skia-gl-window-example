@@ -43,8 +43,8 @@ fn main() {
         format: skia_safe::gpu::gl::Format::RGBA8.into(),
     };
 
-    let size = windowed_context.window().inner_size();
-    let backend_render_target = BackendRenderTarget::new_gl(
+    let mut size = windowed_context.window().inner_size();
+    let mut backend_render_target = BackendRenderTarget::new_gl(
         (
             size.width.try_into().unwrap(),
             size.height.try_into().unwrap(),
@@ -75,7 +75,31 @@ fn main() {
         match event {
             Event::LoopDestroyed => {}
             Event::WindowEvent { event, .. } => match event {
-                WindowEvent::Resized(physical_size) => windowed_context.resize(physical_size),
+                WindowEvent::Resized(physical_size) => {
+                    size = physical_size;
+                    windowed_context.resize(size);
+
+                    backend_render_target = BackendRenderTarget::new_gl(
+                        (
+                            size.width.try_into().unwrap(),
+                            size.height.try_into().unwrap(),
+                        ),
+                        pixel_format.multisampling.map(|s| s.try_into().unwrap()),
+                        pixel_format.stencil_bits.try_into().unwrap(),
+                        fb_info,
+                    );
+                    surface = Surface::from_backend_render_target(
+                        &mut gr_context,
+                        &backend_render_target,
+                        SurfaceOrigin::BottomLeft,
+                        ColorType::RGBA8888,
+                        None,
+                        None,
+                    )
+                    .unwrap();
+
+                    windowed_context.window().request_redraw();
+                },
                 WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                 WindowEvent::KeyboardInput {
                     input:
